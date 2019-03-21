@@ -1,8 +1,6 @@
 package broadcast
 
 import (
-	"log"
-
 	"git.dev.kochava.com/notter/distchat/websocketutil"
 	"golang.org/x/net/websocket"
 )
@@ -16,6 +14,5 @@ type WebsocketHandlerProxy struct {
 }
 
 func (handler *WebsocketHandlerProxy) Handle(conn *websocket.Conn) {
-	log.Println("Handling the connection")
 	handler.ReadWriteHandler.Handle(conn)
 }
