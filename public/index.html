@@ -1,0 +1,55 @@
+<!DOCTYPE HTML>
+
+<html>
+   <head>
+
+      <script type = "text/javascript">
+         window.onload = function() {
+            var sendButton = document.getElementById('sendlink');
+            var messageInput = document.getElementById('messageInput');
+            var messageBoard = document.getElementById('messageBoard');
+
+            if ("WebSocket" in window) {
+               console.log("WebSocket is supported by your Browser!");
+
+               // Let us open a web socket
+               var ws = new WebSocket("ws://127.0.0.1:4001/");
+
+               ws.onopen = function() {
+                  // Web Socket is connected, send data using send()
+                  console.log("Websocket opened")
+               };
+
+               ws.onmessage = function (evt) {
+                  var received_msg = evt.data;
+                  messageBoard.innerHTML += received_msg
+               };
+
+               ws.onclose = function() {
+                   console.log("Websocket closed")
+               };
+
+               sendButton.onclick = function() {
+                   var message = messageInput.value
+                   messageInput.value = ""
+
+                   ws.send(message + "\n")
+               }
+            } else {
+               // The browser doesn't support WebSocket
+               messageBoard.innerHTML = "WebSocket NOT supported by your Browser!";
+            }
+         }
+      </script>
+
+   </head>
+
+   <body>
+      <div id = "sse">
+         Message <input type="text" id="messageInput" /> <a href="#" id="sendlink">Send</a>
+      </div>
+
+      <pre id="messageBoard"></pre>
+
+   </body>
+</html>

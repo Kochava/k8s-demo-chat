@@ -1,0 +1,9 @@
+[submodule "vendor/gopkg.in/bsm/ratelimit.v1"]
+	path = vendor/gopkg.in/bsm/ratelimit.v1
+	url = http://gopkg.in/bsm/ratelimit.v1
+[submodule "vendor/github.com/go-redis/redis"]
+	path = vendor/github.com/go-redis/redis
+	url = http://github.com/go-redis/redis
+[submodule "vendor/golang.org/x/net"]
+	path = vendor/golang.org/x/net
+	url = http://github.com/golang/net

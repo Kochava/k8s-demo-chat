@@ -1,0 +1,42 @@
+# Exposes ports to host.
+version: '2.1'
+
+services:
+  webserver:
+    image: nginx:1.15.9
+    volumes:
+      - ./public:/usr/share/nginx/html
+    ports:
+      - 8080:80
+
+  tcpserver:
+    image: alpine:3.9.2
+    command: ["/tmp/bin/tcpserver", "-server-addr", "0.0.0.0:4000"]
+    volumes:
+      - ./bin:/tmp/bin
+    ports:
+      - 4000:4000
+    links:
+      - redis
+
+  websocketserver:
+    image: alpine:3.9.2
+    command: ["/tmp/bin/websocketserver", "-server-addr", "0.0.0.0:4001"]
+    volumes:
+      - ./bin:/tmp/bin
+    ports:
+      - 4001:4001
+    links:
+      - redis
+
+  redis:
+    image: redis:3.2-alpine
+    ports:
+        - 6379:6379
+    stop_signal: SIGKILL
+    healthcheck:
+      # redis-cli likes to return exit code 0, so check stdout instead
+      test: redis-cli -h redis ping | grep PONG
+      interval: 1s
+      retries: 5
+      timeout: 500ms
