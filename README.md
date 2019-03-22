@@ -1,5 +1,7 @@
 # Distchat
 
+[![CircleCI](https://circleci.com/gh/Kochava/k8s-demo-chat.svg?style=svg)](https://circleci.com/gh/Kochava/k8s-demo-chat)
+
 Distchat contains three applications: a TCP server, a WebSocket server, and
 a web server. The TCP and WebSocket servers publish and subscribe messages to
 Redis allowing the services to be stateless. The web server connects to the
