@@ -4,9 +4,9 @@ import (
 	"flag"
 	"log"
 
-	"git.dev.kochava.com/notter/distchat/broadcast"
-	"git.dev.kochava.com/notter/distchat/build"
-	"git.dev.kochava.com/notter/distchat/websocketutil"
+	"github.com/Kochava/k8s-demo-chat/internal/broadcast"
+	"github.com/Kochava/k8s-demo-chat/internal/build"
+	"github.com/Kochava/k8s-demo-chat/internal/websocketutil"
 )
 
 func main() {

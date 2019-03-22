@@ -5,15 +5,15 @@ services:
   webserver:
     image: nginx:1.15.9
     volumes:
-      - ./public:/usr/share/nginx/html
+      - ./web:/usr/share/nginx/html
     ports:
       - 8080:80
 
   tcpserver:
     image: alpine:3.9.2
-    command: ["/tmp/bin/tcpserver", "-server-addr", "0.0.0.0:4000"]
+    command: ["./bin/tcpserver", "-server-addr", "0.0.0.0:4000"]
     volumes:
-      - ./bin:/tmp/bin
+      - ./bin:./bin
     ports:
       - 4000:4000
     links:
@@ -21,9 +21,9 @@ services:
 
   websocketserver:
     image: alpine:3.9.2
-    command: ["/tmp/bin/websocketserver", "-server-addr", "0.0.0.0:4001"]
+    command: ["./bin/websocketserver", "-server-addr", "0.0.0.0:4001"]
     volumes:
-      - ./bin:/tmp/bin
+      - ./bin:./bin
     ports:
       - 4001:4001
     links:

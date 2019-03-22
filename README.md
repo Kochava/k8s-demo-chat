@@ -8,10 +8,16 @@ using `nc` or similar applications.
 
 ## Usage
 
+### Build
+
+```
+make servers
+```
+
 ### Start
 
 ```
-$ bash ./compile.sh
+$ make servers
 $ docker-compose up
 ```
 ### Chat

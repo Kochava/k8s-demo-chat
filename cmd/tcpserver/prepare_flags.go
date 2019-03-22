@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 
-	"git.dev.kochava.com/notter/distchat/build"
+	"github.com/Kochava/k8s-demo-chat/internal/build"
 )
 
 func prepareFlags(config *build.Config) {
