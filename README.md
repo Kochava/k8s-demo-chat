@@ -16,12 +16,12 @@ using `nc` or similar applications.
 make servers
 ```
 
-### Start
+### Running local
 
 ```
-$ make servers
-$ docker-compose up
+$ make servers run
 ```
+
 ### Chat
 
 **TCP**

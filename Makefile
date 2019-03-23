@@ -6,11 +6,11 @@ servers: servers-websockets servers-tcp
 
 .PHONY: servers-websockets
 servers-websockets: # Build the websockets binary
-	GOOS=linux GOARCH=amd64 go build -o $(MAKE_PATH)bin/chat-ws-server github.com/Kochava/k8s-demo-chat/cmd/websocketserver
+	GOOS=linux CGO_ENABLED=0 GOARCH=amd64 go build -o $(MAKE_PATH)bin/chat-ws-server github.com/Kochava/k8s-demo-chat/cmd/websocketserver
 
 .PHONY: servers-tcp
 servers-tcp: # Build the tcp server binary
-	GOOS=linux GOARCH=amd64 go build -o $(MAKE_PATH)bin/chat-tcp-server github.com/Kochava/k8s-demo-chat/cmd/tcpserver
+	GOOS=linux CGO_ENABLED=0 GOARCH=amd64 go build -o $(MAKE_PATH)bin/chat-tcp-server github.com/Kochava/k8s-demo-chat/cmd/tcpserver
 
 .PHONY: update
 update: # Update submodules and other deps
@@ -34,5 +34,5 @@ clean:
 
 .PHONY: run-local
 run:
-	# docker compose here
-	echo "NA"
+	docker-compose -f build/local/docker-compose.yml --project-directory . up 
+
