@@ -1,7 +1,7 @@
 package broadcast
 
 import (
-	"git.dev.kochava.com/notter/distchat/websocketutil"
+	"github.com/Kochava/k8s-demo-chat/internal/websocketutil"
 	"golang.org/x/net/websocket"
 )
 

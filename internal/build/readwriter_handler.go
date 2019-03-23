@@ -1,8 +1,8 @@
 package build
 
 import (
-	"git.dev.kochava.com/notter/distchat/broadcast"
-	"git.dev.kochava.com/notter/distchat/broadcast/redis"
+	"github.com/Kochava/k8s-demo-chat/internal/broadcast"
+	"github.com/Kochava/k8s-demo-chat/internal/broadcast/redis"
 	redis "github.com/go-redis/redis"
 )
 
