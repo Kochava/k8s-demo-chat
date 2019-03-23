@@ -2,8 +2,8 @@ package broadcast
 
 import (
 	"bufio"
-	"fmt"
 	"io"
+	"log"
 	"math/rand"
 	"time"
 
@@ -16,8 +16,9 @@ func init() {
 
 // ReadWriteHandler allows an io.ReadWriter to send and receive chats
 type ReadWriteHandler struct {
-	Writer        io.Writer
-	WriterStorage writerutil.Storage
+	InputValidator InputValidator
+	Writer         io.Writer
+	WriterStorage  writerutil.Storage
 }
 
 // Handle communicates with a TCP connection
@@ -35,14 +36,34 @@ func (handler *ReadWriteHandler) Handle(readWriter io.ReadWriter) {
 		)
 
 		if err == io.EOF {
+			log.Println("recieved EOF")
 			return
 		} else if err != nil {
-			fmt.Println("Error:", err.Error())
+			log.Println("failed to read input:", err.Error())
 			return
 		}
 
-		handler.Writer.Write([]byte(incommingData))
+		handler.handleInput([]byte(incommingData), readWriter)
 	}
+}
+
+func (handler *ReadWriteHandler) handleInput(input []byte, writer io.Writer) {
+	var (
+		err        error
+		validInput bool
+	)
+
+	if validInput, err = handler.InputValidator.Validate(input); err != nil {
+		writer.Write([]byte("unable to validate input"))
+		return
+	}
+
+	if !validInput {
+		writer.Write([]byte("invalid input"))
+		return
+	}
+
+	handler.Writer.Write(input)
 }
 
 func (handler *ReadWriteHandler) getConnectionName() string {

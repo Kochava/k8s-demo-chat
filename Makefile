@@ -34,5 +34,7 @@ clean:
 
 .PHONY: run-local
 run:
-	docker-compose -f docker/docker-compose.yml --project-directory . up 
+	docker-compose -f docker/docker-compose.yml --project-directory . up
 
+stop:
+	docker-compose -f docker/docker-compose.yml --project-directory . down

@@ -3,6 +3,9 @@ package main
 import (
 	"flag"
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/Kochava/k8s-demo-chat/internal/broadcast"
 	"github.com/Kochava/k8s-demo-chat/internal/build"
@@ -19,6 +22,8 @@ func main() {
 		tcpHandler       tcputil.Handler
 
 		tcpServer tcputil.Server
+
+		sigs = make(chan os.Signal, 1)
 	)
 
 	prepareFlags(config)
@@ -31,6 +36,8 @@ func main() {
 		return
 	}
 
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+
 	tcpHandler = &broadcast.TCPHandlerProxy{
 		ReadWriteHandler: readWriteHandler,
 	}
@@ -40,7 +47,12 @@ func main() {
 		Handler: tcpHandler,
 	}
 
-	if err = tcpServer.ListenAndServe(); err != nil {
-		log.Println("error starting server:", err.Error())
-	}
+	go func() {
+		if err = tcpServer.ListenAndServe(); err != nil {
+			log.Fatalf("error starting server: %s", err.Error())
+		}
+	}()
+
+	<-sigs
+	tcpServer.Shutdown()
 }

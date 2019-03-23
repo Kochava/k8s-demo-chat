@@ -1,8 +1,12 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/Kochava/k8s-demo-chat/internal/broadcast"
 	"github.com/Kochava/k8s-demo-chat/internal/build"
@@ -19,6 +23,8 @@ func main() {
 		websocketHandler websocketutil.Handler
 
 		websocketServer websocketutil.Server
+
+		sigs = make(chan os.Signal, 1)
 	)
 
 	prepareFlags(config)
@@ -31,6 +37,8 @@ func main() {
 		return
 	}
 
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+
 	websocketHandler = &broadcast.WebsocketHandlerProxy{
 		ReadWriteHandler: readWriteHandler,
 	}
@@ -40,7 +48,12 @@ func main() {
 		HandleFunc: websocketHandler.Handle,
 	}
 
-	if err = websocketServer.ListenAndServe(); err != nil {
-		log.Println("error starting server:", err.Error())
-	}
+	go func() {
+		if err = websocketServer.ListenAndServe(); err != nil {
+			log.Fatalf("error starting server: %s", err.Error())
+		}
+	}()
+
+	<-sigs
+	websocketServer.Shutdown(context.Background())
 }

@@ -30,6 +30,10 @@ func GetReadWriterHandler(config *Config) (*broadcast.ReadWriteHandler, error) {
 		}
 	)
 
+	if readWriteHandler.InputValidator, err = broadcast.NewJSONSchemaValidator(config.JSONValidationSchemaPath); err != nil {
+		return nil, err
+	}
+
 	if redisClient, err = Redis(config); err != nil {
 		return nil, err
 	}

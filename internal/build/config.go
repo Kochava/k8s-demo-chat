@@ -4,5 +4,8 @@ package build
 type Config struct {
 	RedisAddr    string
 	RedisChannel string
-	ServerAddr   string
+
+	ServerAddr string
+
+	JSONValidationSchemaPath string
 }

@@ -1,55 +1,129 @@
 <!DOCTYPE HTML>
+<html lang="en">
+    <head>
 
-<html>
-   <head>
+        <!-- bootstrap -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
-      <script type = "text/javascript">
-         window.onload = function() {
-            var sendButton = document.getElementById('sendlink');
-            var messageInput = document.getElementById('messageInput');
-            var messageBoard = document.getElementById('messageBoard');
+        <!-- view - production version, optimized for size and speed -->
+        <script src="https://cdn.jsdelivr.net/npm/vue"></script>
 
-            if ("WebSocket" in window) {
-               console.log("WebSocket is supported by your Browser!");
+        <!-- blueimp library, for md5 -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-md5/2.10.0/js/md5.js"></script>
 
-               // Let us open a web socket
-               var ws = new WebSocket("ws://127.0.0.1:4001/");
+        <script type = "text/javascript">
 
-               ws.onopen = function() {
-                  // Web Socket is connected, send data using send()
-                  console.log("Websocket opened")
-               };
+            window.onload = function() {``
+                if ("WebSocket" in window) {
+                    console.log("WebSocket is supported by your Browser!");
 
-               ws.onmessage = function (evt) {
-                  var received_msg = evt.data;
-                  messageBoard.innerHTML += received_msg
-               };
+                    // Let us open a web socket
+                    var ws = new WebSocket("ws://127.0.0.1:4001/");
 
-               ws.onclose = function() {
-                   console.log("Websocket closed")
-               };
+                    var app = new Vue({
+                        el: '#app',
+                        data: {
+                            email: "",
+                            errorMessage: "",
+                            messageToSend: "",
+                            messages: []
+                        },
+                        methods: {
+                            getGravitarURL: function(email) {
+                                var hash = md5(email.toLowerCase());
+                                return "https://www.gravatar.com/avatar/"+ hash +".jpg?s=32";
+                            },
+                            sendMessage: function(event) {
+                                if (this.messageToSend.length == 0) {
+                                    return
+                                }
 
-               sendButton.onclick = function() {
-                   var message = messageInput.value
-                   messageInput.value = ""
+                                var message = {
+                                    email: this.email,
+                                    msg: this.messageToSend
+                                };
 
-                   ws.send(message + "\n")
-               }
-            } else {
-               // The browser doesn't support WebSocket
-               messageBoard.innerHTML = "WebSocket NOT supported by your Browser!";
+                                var messageJSON = JSON.stringify(message);
+
+                                this.messageToSend = ""
+                                ws.send(messageJSON + "\n");
+                            },
+                            addMessage: function(message) {
+                                message.imageURL = this.getGravitarURL(message.email)
+                                this.messages.push(message)
+                            }
+                        }
+                    })
+
+                    ws.onopen = function() {
+                        // Web Socket is connected, send data using send()
+                        console.log("Websocket opened")
+                    };
+
+                    ws.onmessage = function (evt) {
+                        console.log("message", evt.data);
+
+                        if (evt.data == "unable to validate input") {
+                            app.errorMessage = evt.data;
+                            return
+                        } else {
+                            app.errorMessage = "";
+                        }
+
+                        var messageReceived = JSON.parse(evt.data);
+                        app.addMessage(messageReceived);
+                    };
+
+                    ws.onclose = function() {
+                        console.log("Websocket closed")
+                    };
+                } else {
+                    // The browser doesn't support WebSocket
+                    messageBoard.innerHTML = "WebSocket NOT supported by your Browser!";
+                }
             }
-         }
-      </script>
+        </script>
 
-   </head>
+    </head>
 
-   <body>
-      <div id = "sse">
-         Message <input type="text" id="messageInput" /> <a href="#" id="sendlink">Send</a>
-      </div>
+    <body>
+        <div id="app" class="container">
+            <div class="header">
+                <h1>K8 Chat Demo</h1>
+            </div>
+            <form>
+                <div class="form-group row">
+                    <label for="staticEmail" class="col-sm-2 col-form-label">Email</label>
+                    <div class="col-sm-10">
+                        <input id="staticEmail" class="form-control form-control-sm" type="text" v-model="email" />
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="inputMessage" class="col-sm-2 col-form-label">Message</label>
+                    <div class="col-sm-10">
+                        <input id="inputMessage" class="form-control form-control-sm" type="text" v-model="messageToSend" v-on:keyup.enter="sendMessage" />
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-10">
+                        <button type="button" class="btn btn-outline-primary" v-on:click="sendMessage">Send</button>
+                    </div>
+                </div>
+            </form>
+            <div v-if="errorMessage" class="row">
+                <div class="alert alert-danger col-12" role="alert">
+                    {{errorMessage}}
+                </div>
+            </div>
 
-      <pre id="messageBoard"></pre>
-
-   </body>
+            <div v-for="message in messages" class="row">
+                <div class="col-1 email">
+                    <img v-bind:src="message.imageURL" v-bind:title="message.email" />
+                </div>
+                <div class="col-11">
+                    <div class="text">{{message.msg}}</div>
+                </div>
+            </div>
+        </div>
+    </body>
 </html>
