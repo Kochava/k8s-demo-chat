@@ -2,7 +2,7 @@
 version: '2.1'
 
 services:
-  webserver:
+  frontend:
     image: nginx:1.15.9
     volumes:
       - ./public:/usr/share/nginx/html
