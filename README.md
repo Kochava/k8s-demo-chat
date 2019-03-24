@@ -10,16 +10,32 @@ using `nc` or similar applications.
 
 ## Usage
 
-### Build
+### Compile
 
 ```
 make servers
 ```
 
+### Container Image Creation
+
+```
+docker build -f docker/Dockerfile.frontend -t k8sdemo-frontend .
+docker build -f docker/Dockerfile.chat-tcp-server -t k8sdemo-chat-tcp-server .
+docker build -f docker/Dockerfile.chat-ws-server -t k8sdemo-chat-ws-server .
+
+docker tag k8sdemo-frontend gcr.io/<project>/k8sdemo-frontend/latest
+docker tag k8sdemo-chat-tcp-server gcr.io/<project>/k8sdemo-chat-tcp-server/latest
+docker tag k8sdemo-chat-ws-server gcr.io/<project>/k8sdemo-chat-ws-server/latest
+
+docker push gcr.io/<project>/k8sdemo-frontend/latest
+docker push gcr.io/<project>/k8sdemo-chat-tcp-server/latest
+docker push gcr.io/<project>/k8sdemo-chat-ws-server/latest
+```
+
 ### Running local
 
 ```
-$ make servers run
+$ make run
 ```
 
 ### Chat
@@ -33,3 +49,4 @@ $ nc 127.0.0.1 4000
 **Web**
 
 http://127.0.0.1:8080/
+

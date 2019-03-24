@@ -1,18 +1,142 @@
-# Golang CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-go/ for more details
-version: 2
+version: 2.1
+# Pull in gcloud sdk setup in commands
+orbs:
+  gcp-cli: circleci/gcp-cli@1.0.2
+
+###############################################################################
+# Workflows
+###############################################################################
+workflows:
+  version: 2.1
+  main:
+    jobs:
+      - test
+      - build_go:
+          requires:
+            - test
+          # filters:
+          #   tags:
+          #     only: /v[0-9]+(\.[0-9]+)*$/
+          #   branches:
+          #     ignore: /.*/
+      - publish_gcr:
+          requires:
+            - build_go
+          # filters:
+          #   tags:
+          #     only: /v[0-9]+(\.[0-9]+)*$/
+          #   branches:
+          #     ignore: /.*/
+
+###############################################################################
+# Job Definitions
+###############################################################################
 jobs:
-  build:
+  # Run tests
+  test:
     docker:
       - image: circleci/golang:1.12
-
-    #### TEMPLATE_NOTE: go expects specific checkout path representing url
-    #### expecting it in the form of
-    ####   /go/src/github.com/circleci/go-tool
-    ####   /go/src/bitbucket.org/circleci/go-tool
     working_directory: /go/src/github.com/Kochava/k8s-demo-chat
     steps:
       - checkout
-      - run: make update
-      - run: make test
+      - attach_workspace:
+          at: /go/src/github.com/Kochava/k8s-demo-chat
+      - run: make update test
+      - persist_to_workspace:
+          root: .
+          paths: vendor
+  
+  # Build binaries
+  build_go:
+    docker:
+      - image: circleci/golang:1.12
+    working_directory: /go/src/github.com/Kochava/k8s-demo-chat
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /go/src/github.com/Kochava/k8s-demo-chat
+      - run: make servers
+      - persist_to_workspace:
+          root: .
+          paths:
+            - bin
+            - docker
+            - public
+  
+  # Build and publish frontend container
+  publish_gcr:
+    machine: true
+    working_directory: /tmp/workspace
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - gcr_auth
+      - gcr_build_and_publish:
+          dockerfile: docker/frontend/Dockerfile
+          image-name: k8sdemo-frontend
+          tag: latest
+      - gcr_build_and_publish:
+          dockerfile: docker/chat-tcp-server/Dockerfile
+          image-name: k8sdemo-chat-tcp-server
+          tag: latest
+      - gcr_build_and_publish:
+          dockerfile: docker/chat-ws-server/Dockerfile
+          image-name: k8sdemo-chat-ws-server
+          tag: latest
+
+###############################################################################
+# Custom commands
+###############################################################################
+commands:
+  gcr_auth:
+    parameters:
+      gcloud-service-key:
+        type: env_var_name
+        default: GCLOUD_SERVICE_KEY
+      google-project-id:
+        type: env_var_name
+        default: GOOGLE_PROJECT_ID
+      google-compute-zone:
+        type: env_var_name
+        default: GOOGLE_COMPUTE_ZONE
+    steps:
+      - gcp-cli/install
+      - gcp-cli/initialize:
+          google-project-id: <<parameters.google-project-id>>
+          google-compute-zone: <<parameters.google-compute-zone>>
+      - run:
+          name: Authenticate to GCR
+          command: |
+            if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
+            mkdir -p /home/circleci/.docker
+            $SUDO gcloud alpha auth configure-docker --quiet --project $<<parameters.google-project-id>>
+            $SUDO chown circleci:circleci /home/circleci/.docker -R
+
+            if [[ -d /home/circleci/.config ]]; then
+              $SUDO chown circleci:circleci /home/circleci/.config -R
+            fi
+
+  gcr_build_and_publish:
+    parameters:
+      google-project-id:
+        type: env_var_name
+        default: GOOGLE_PROJECT_ID
+      dockerfile:
+        type: string
+        default: "Dockerfile"
+      image-name:
+        type: string
+      tag:
+        description: The image tag
+        type: string
+        default: "latest"
+    steps:
+      - run:
+          name: Build <<parameters.image-name>>:<<parameters.tag>> docker image
+          command: |
+            docker build -t gcr.io/$<<parameters.google-project-id>>/<<parameters.image-name>>:<<parameters.tag>> -f <<parameters.dockerfile>> .
+      - run:
+          name: Publish <<parameters.image-name>>:<<parameters.tag>> docker image
+          command: |
+            docker push gcr.io/$<<parameters.google-project-id>>/<<parameters.image-name>>:<<parameters.tag>>
+
