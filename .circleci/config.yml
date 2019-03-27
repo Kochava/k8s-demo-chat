@@ -11,8 +11,9 @@ workflows:
   main:
     jobs:
       - test:
-          tags:
-            ignore: /.*/
+          filters:
+            tags:
+              ignore: /.*/
   tagged:
     jobs:
       - build_go:
