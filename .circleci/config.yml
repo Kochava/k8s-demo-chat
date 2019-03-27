@@ -54,9 +54,6 @@ jobs:
       - attach_workspace:
           at: /go/src/github.com/Kochava/k8s-demo-chat
       - run: make update test
-      - persist_to_workspace:
-          root: .
-          paths: vendor
   
   # Build binaries
   build_go:
@@ -67,7 +64,7 @@ jobs:
       - checkout
       - attach_workspace:
           at: /go/src/github.com/Kochava/k8s-demo-chat
-      - run: make servers
+      - run: make update servers
       - persist_to_workspace:
           root: .
           paths:
