@@ -81,17 +81,9 @@ jobs:
           at: /tmp/workspace
       - gcr_auth
       - gcr_build_and_publish:
-          dockerfile: docker/frontend/Dockerfile
-          image-name: k8sdemo-frontend
-          tag: latest
-      - gcr_build_and_publish:
-          dockerfile: docker/chat-tcp-server/Dockerfile
-          image-name: k8sdemo-chat-tcp-server
-          tag: latest
-      - gcr_build_and_publish:
-          dockerfile: docker/chat-ws-server/Dockerfile
-          image-name: k8sdemo-chat-ws-server
-          tag: latest
+          dockerfile: docker/chat-server/Dockerfile
+          image-name: k8sdemo-chat-server
+          tag: "$CIRCLE_TAG"
   deploy_gke:
     docker:
       - image: circleci/buildpack-deps:xenial
@@ -102,21 +94,9 @@ jobs:
       - gke_deploy:
           cluster: k8s-demo-cluster
           namespace: k8s-demo
-          deployment: frontend
-          image-name: k8sdemo-frontend
-          tag: latest
-      - gke_deploy:
-          cluster: k8s-demo-cluster
-          namespace: k8s-demo
-          deployment: chat-ws-server
-          image-name: k8sdemo-chat-ws-server
-          tag: latest
-      - gke_deploy:
-          cluster: k8s-demo-cluster
-          namespace: k8s-demo
-          deployment: chat-tcp-server
-          image-name: k8sdemo-chat-tcp-server
-          tag: latest
+          deployment: chat-server
+          image-name: k8sdemo-chat-server
+          tag: "$CIRCLE_TAG"
 
 ###############################################################################
 # Custom commands
@@ -163,7 +143,6 @@ commands:
       tag:
         description: The image tag
         type: string
-        default: "latest"
     steps:
       - run:
           name: Build <<parameters.image-name>>:<<parameters.tag>> docker image
@@ -173,6 +152,7 @@ commands:
           name: Publish <<parameters.image-name>>:<<parameters.tag>> docker image
           command: |
             docker push gcr.io/$<<parameters.google-project-id>>/<<parameters.image-name>>:<<parameters.tag>>
+            docker push gcr.io/$<<parameters.google-project-id>>/<<parameters.image-name>>:latest
 
   gke_kubectl_install:
     parameters:
