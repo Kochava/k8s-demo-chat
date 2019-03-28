@@ -35,7 +35,8 @@ docker push gcr.io/<project>/k8sdemo-chat-ws-server/latest
 ### Running local
 
 ```
-$ make run
+$ make composer-up
+$ make composer-down
 ```
 
 ### Chat
