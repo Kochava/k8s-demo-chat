@@ -50,10 +50,12 @@ func (handler *ReadWriteHandler) Handle(readWriter io.ReadWriter) {
 		if validInput, err = handler.InputValidator.Valid(incommingData); err != nil {
 			log.Println("invalid input:", err.Error())
 			readWriter.Write([]byte("unable to validate input"))
+			continue
 		}
 
 		if !validInput {
 			readWriter.Write([]byte("unable to validate input"))
+			continue
 		}
 
 		handler.Writer.Write(incommingData)
