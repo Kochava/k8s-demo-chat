@@ -10,3 +10,9 @@
 [submodule "vendor/github.com/xeipuuv/gojsonschema"]
 	path = vendor/github.com/xeipuuv/gojsonschema
 	url = http://github.com/xeipuuv/gojsonschema
+[submodule "vendor/github.com/xeipuuv/gojsonreference"]
+	path = vendor/github.com/xeipuuv/gojsonreference
+	url = http://github.com/xeipuuv/gojsonreference
+[submodule "vendor/github.com/xeipuuv/gojsonpointer"]
+	path = vendor/github.com/xeipuuv/gojsonpointer
+	url = http://github.com/xeipuuv/gojsonpointer
