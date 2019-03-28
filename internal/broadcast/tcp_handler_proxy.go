@@ -3,7 +3,7 @@ package broadcast
 import (
 	"net"
 
-	"git.dev.kochava.com/notter/distchat/tcputil"
+	"github.com/Kochava/k8s-demo-chat/internal/tcputil"
 )
 
 var (

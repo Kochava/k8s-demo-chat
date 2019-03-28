@@ -1,8 +1,9 @@
 package build
 
 import (
-	"git.dev.kochava.com/notter/distchat/broadcast"
-	"git.dev.kochava.com/notter/distchat/broadcast/redis"
+	"github.com/Kochava/k8s-demo-chat/internal/broadcast"
+	redisbroadcast "github.com/Kochava/k8s-demo-chat/internal/broadcast/redis"
+	buildredis "github.com/Kochava/k8s-demo-chat/internal/build/redis"
 	redis "github.com/go-redis/redis"
 )
 
@@ -30,25 +31,27 @@ func GetReadWriterHandler(config *Config) (*broadcast.ReadWriteHandler, error) {
 		}
 	)
 
-	if redisClient, err = Redis(config); err != nil {
+	if readWriteHandler.InputValidator, err = broadcast.NewJSONSchemaValidator(config.JSONValidationSchemaPath); err != nil {
 		return nil, err
 	}
 
-	pubsub = redisClient.Subscribe(config.RedisChannel)
+	if redisClient, err = buildredis.BuildGoRedis(config.Redis); err != nil {
+		return nil, err
+	}
+
+	pubsub = redisClient.Subscribe(config.Redis.Channel)
 
 	retriever = redisbroadcast.Retriever{
 		PubSub: pubsub,
 		Writer: broadcastWriter,
 	}
-
 	go retriever.Retrieve()
 
 	publisher = redisbroadcast.Publisher{
+		RedisChannel:   config.Redis.Channel,
 		MessageChannel: messagesToStore,
-		RedisChannel:   config.RedisChannel,
 		RedisClient:    redisClient,
 	}
-
 	go publisher.Publish()
 
 	return readWriteHandler, nil

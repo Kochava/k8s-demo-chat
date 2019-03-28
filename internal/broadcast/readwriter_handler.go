@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"log"
 	"math/rand"
 	"time"
 
@@ -16,8 +17,9 @@ func init() {
 
 // ReadWriteHandler allows an io.ReadWriter to send and receive chats
 type ReadWriteHandler struct {
-	Writer        io.Writer
-	WriterStorage writerutil.Storage
+	Writer         io.Writer
+	WriterStorage  writerutil.Storage
+	InputValidator InputValidator
 }
 
 // Handle communicates with a TCP connection
@@ -31,7 +33,9 @@ func (handler *ReadWriteHandler) Handle(readWriter io.ReadWriter) {
 
 	for {
 		var (
-			incommingData, err = bufio.NewReader(readWriter).ReadString('\n')
+			validInput            bool
+			incommingData         []byte
+			incommingDataStr, err = bufio.NewReader(readWriter).ReadString('\n')
 		)
 
 		if err == io.EOF {
@@ -41,7 +45,18 @@ func (handler *ReadWriteHandler) Handle(readWriter io.ReadWriter) {
 			return
 		}
 
-		handler.Writer.Write([]byte(incommingData))
+		incommingData = []byte(incommingDataStr)
+
+		if validInput, err = handler.InputValidator.Valid(incommingData); err != nil {
+			log.Println("invalid input:", err.Error())
+			readWriter.Write([]byte("unable to validate input"))
+		}
+
+		if !validInput {
+			readWriter.Write([]byte("unable to validate input"))
+		}
+
+		handler.Writer.Write(incommingData)
 	}
 }
 

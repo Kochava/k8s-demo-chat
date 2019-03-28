@@ -15,10 +15,16 @@
                // Let us open a web socket
                var ws = new WebSocket("ws://127.0.0.1:4001/");
 
+<<<<<<< Updated upstream
                ws.onopen = function() {
                   // Web Socket is connected, send data using send()
                   console.log("Websocket opened")
                };
+=======
+            window.onload = function() {
+                if ("WebSocket" in window) {
+                    console.log("WebSocket is supported by your Browser!");
+>>>>>>> Stashed changes
 
                ws.onmessage = function (evt) {
                   var received_msg = evt.data;

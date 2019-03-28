@@ -5,7 +5,7 @@ import (
 	"log"
 	"sync"
 
-	"git.dev.kochava.com/notter/distchat/writerutil"
+	"github.com/Kochava/k8s-demo-chat/internal/writerutil"
 )
 
 var (

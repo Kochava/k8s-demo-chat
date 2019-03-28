@@ -3,41 +3,34 @@ package main
 import (
 	"flag"
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
 
-	"git.dev.kochava.com/notter/distchat/broadcast"
-	"git.dev.kochava.com/notter/distchat/build"
-	"git.dev.kochava.com/notter/distchat/websocketutil"
+	"github.com/Kochava/k8s-demo-chat/internal/build"
+	"github.com/Kochava/k8s-demo-chat/internal/websocketutil"
 )
 
 func main() {
 	var (
 		err error
 
-		config = &build.Config{}
+		config          = &build.Config{}
+		websocketServer *websocketutil.Server
 
-		readWriteHandler *broadcast.ReadWriteHandler
-		websocketHandler websocketutil.Handler
-
-		websocketServer websocketutil.Server
+		sigs = make(chan os.Signal, 1)
 	)
 
-	prepareFlags(config)
+	build.PrepareFlags(config)
 	flag.Parse()
 
 	log.Println("Config", config)
 
-	if readWriteHandler, err = build.GetReadWriterHandler(config); err != nil {
-		log.Println("unable to get read write handler:", err.Error())
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+
+	if websocketServer, err = build.WebsocketServer(config); err != nil {
+		log.Println("Unable to create websocket server:", err.Error())
 		return
-	}
-
-	websocketHandler = &broadcast.WebsocketHandlerProxy{
-		ReadWriteHandler: readWriteHandler,
-	}
-
-	websocketServer = websocketutil.Server{
-		Addr:       config.ServerAddr,
-		HandleFunc: websocketHandler.Handle,
 	}
 
 	if err = websocketServer.ListenAndServe(); err != nil {

@@ -3,41 +3,34 @@ package main
 import (
 	"flag"
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
 
-	"git.dev.kochava.com/notter/distchat/broadcast"
-	"git.dev.kochava.com/notter/distchat/build"
-	"git.dev.kochava.com/notter/distchat/tcputil"
+	"github.com/Kochava/k8s-demo-chat/internal/build"
+	"github.com/Kochava/k8s-demo-chat/internal/tcputil"
 )
 
 func main() {
 	var (
 		err error
 
-		config = &build.Config{}
+		config    = &build.Config{}
+		tcpServer *tcputil.Server
 
-		readWriteHandler *broadcast.ReadWriteHandler
-		tcpHandler       tcputil.Handler
-
-		tcpServer tcputil.Server
+		sigs = make(chan os.Signal, 1)
 	)
 
-	prepareFlags(config)
+	build.PrepareFlags(config)
 	flag.Parse()
 
 	log.Println("Config", config)
 
-	if readWriteHandler, err = build.GetReadWriterHandler(config); err != nil {
-		log.Println("unable to get read write handler:", err.Error())
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+
+	if tcpServer, err = build.TCPServer(config); err != nil {
+		log.Println("unable to make TCP server:", err.Error())
 		return
-	}
-
-	tcpHandler = &broadcast.TCPHandlerProxy{
-		ReadWriteHandler: readWriteHandler,
-	}
-
-	tcpServer = tcputil.Server{
-		Addr:    config.ServerAddr,
-		Handler: tcpHandler,
 	}
 
 	if err = tcpServer.ListenAndServe(); err != nil {
