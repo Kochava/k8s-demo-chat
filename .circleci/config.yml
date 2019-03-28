@@ -143,13 +143,13 @@ commands:
         default: CIRCLE_TAG
     steps:
       - run:
-          name: Build <<parameters.image-name>>:<<parameters.tag>> docker image
+          name: Build <<parameters.image-name>> docker image
           command: |
-            docker build -t gcr.io/$<<parameters.google-project-id>>/<<parameters.image-name>>:<<parameters.tag>> -f <<parameters.dockerfile>> .
+            docker build -t gcr.io/$<<parameters.google-project-id>>/<<parameters.image-name>>:$<<parameters.tag>> -f <<parameters.dockerfile>> .
       - run:
-          name: Publish <<parameters.image-name>>:<<parameters.tag>> docker image
+          name: Publish <<parameters.image-name>>:$<<parameters.tag>> docker image
           command: |
-            docker push gcr.io/$<<parameters.google-project-id>>/<<parameters.image-name>>:<<parameters.tag>>
+            docker push gcr.io/$<<parameters.google-project-id>>/<<parameters.image-name>>:$<<parameters.tag>>
             docker push gcr.io/$<<parameters.google-project-id>>/<<parameters.image-name>>:latest
 
   gke_kubectl_install:
@@ -215,7 +215,7 @@ commands:
         default: "default"
     steps:
       - run:
-          name: Deploying <<parameters.image-name>>:<<parameters.tag>> to <<parameters.cluster>>
+          name: Deploying <<parameters.image-name>>:$<<parameters.tag>> to <<parameters.cluster>>
           command: |
-            ./kubectl -n <<parameters.namespace>> set image deployments/<<parameters.deployment>> <<parameters.image-name>>=gcr.io/$<<parameters.google-project-id>>/<<parameters.image-name>>:<<parameters.tag>>
+            ./kubectl -n <<parameters.namespace>> set image deployments/<<parameters.deployment>> <<parameters.image-name>>=gcr.io/$<<parameters.google-project-id>>/<<parameters.image-name>>:$<<parameters.tag>>
 
