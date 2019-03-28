@@ -7,3 +7,12 @@
 [submodule "vendor/golang.org/x/net"]
 	path = vendor/golang.org/x/net
 	url = http://github.com/golang/net
+[submodule "vendor/github.com/xeipuuv/gojsonschema"]
+	path = vendor/github.com/xeipuuv/gojsonschema
+	url = http://github.com/xeipuuv/gojsonschema
+[submodule "vendor/github.com/xeipuuv/gojsonreference"]
+	path = vendor/github.com/xeipuuv/gojsonreference
+	url = http://github.com/xeipuuv/gojsonreference
+[submodule "vendor/github.com/xeipuuv/gojsonpointer"]
+	path = vendor/github.com/xeipuuv/gojsonpointer
+	url = http://github.com/xeipuuv/gojsonpointer

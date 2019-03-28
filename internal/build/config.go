@@ -1,8 +1,18 @@
 package build
 
+import "github.com/Kochava/k8s-demo-chat/internal/build/redis"
+
 // Config stores application configuration variables
 type Config struct {
-	RedisAddr    string
-	RedisChannel string
-	ServerAddr   string
+	Redis                    *redis.Config
+	ServerAddr               string
+	ServerMode               string
+	JSONValidationSchemaPath string
+}
+
+// NewConfig initializes an empty config
+func NewConfig() *Config {
+	return &Config{
+		Redis: &redis.Config{},
+	}
 }
