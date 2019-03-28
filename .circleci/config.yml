@@ -83,7 +83,6 @@ jobs:
       - gcr_build_and_publish:
           dockerfile: docker/chat-server/Dockerfile
           image-name: k8sdemo-chat-server
-          tag: "$CIRCLE_TAG"
   deploy_gke:
     docker:
       - image: circleci/buildpack-deps:xenial
@@ -96,7 +95,6 @@ jobs:
           namespace: k8s-demo
           deployment: chat-server
           image-name: k8sdemo-chat-server
-          tag: "$CIRCLE_TAG"
 
 ###############################################################################
 # Custom commands
@@ -141,8 +139,8 @@ commands:
       image-name:
         type: string
       tag:
-        description: The image tag
-        type: string
+        type: env_var_name
+        default: GCIRCLE_TAG
     steps:
       - run:
           name: Build <<parameters.image-name>>:<<parameters.tag>> docker image
@@ -208,8 +206,8 @@ commands:
       image-name:
         type: string
       tag:
-        type: string
-        default: "latest"
+        type: env_var_name
+        default: CIRCLE_TAG
       deployment:
         type: string
       namespace:
