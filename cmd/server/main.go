@@ -29,7 +29,7 @@ func main() {
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
 	if server, err = build.Server(config); err != nil {
-		log.Println("Unable to create websocket server:", err.Error())
+		log.Println("Unable to create server:", err.Error())
 		return
 	}
 
