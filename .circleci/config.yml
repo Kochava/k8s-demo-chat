@@ -140,7 +140,7 @@ commands:
         type: string
       tag:
         type: env_var_name
-        default: GCIRCLE_TAG
+        default: CIRCLE_TAG
     steps:
       - run:
           name: Build <<parameters.image-name>>:<<parameters.tag>> docker image
