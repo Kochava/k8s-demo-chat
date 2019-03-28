@@ -37,9 +37,6 @@ clean:
 ###############################################################################
 # Local run targets
 ###############################################################################
-.PHONY: run
-run: servers composer
-
 .PHONY: composer-up
 composer-up:
 	docker-compose -f docker/docker-compose.yml --project-directory . up --build

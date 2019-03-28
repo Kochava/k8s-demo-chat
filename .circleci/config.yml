@@ -70,7 +70,7 @@ jobs:
           paths:
             - bin
             - docker
-            - public
+            - contrib
   
   # Build and publish frontend container
   publish_gcr:
@@ -81,17 +81,8 @@ jobs:
           at: /tmp/workspace
       - gcr_auth
       - gcr_build_and_publish:
-          dockerfile: docker/frontend/Dockerfile
-          image-name: k8sdemo-frontend
-          tag: latest
-      - gcr_build_and_publish:
-          dockerfile: docker/chat-tcp-server/Dockerfile
-          image-name: k8sdemo-chat-tcp-server
-          tag: latest
-      - gcr_build_and_publish:
-          dockerfile: docker/chat-ws-server/Dockerfile
-          image-name: k8sdemo-chat-ws-server
-          tag: latest
+          dockerfile: docker/chat-server/Dockerfile
+          image-name: k8sdemo-chat-server
   deploy_gke:
     docker:
       - image: circleci/buildpack-deps:xenial
@@ -102,21 +93,8 @@ jobs:
       - gke_deploy:
           cluster: k8s-demo-cluster
           namespace: k8s-demo
-          deployment: frontend
-          image-name: k8sdemo-frontend
-          tag: latest
-      - gke_deploy:
-          cluster: k8s-demo-cluster
-          namespace: k8s-demo
-          deployment: chat-ws-server
-          image-name: k8sdemo-chat-ws-server
-          tag: latest
-      - gke_deploy:
-          cluster: k8s-demo-cluster
-          namespace: k8s-demo
-          deployment: chat-tcp-server
-          image-name: k8sdemo-chat-tcp-server
-          tag: latest
+          deployment: chat-server
+          image-name: k8sdemo-chat-server
 
 ###############################################################################
 # Custom commands
@@ -161,18 +139,19 @@ commands:
       image-name:
         type: string
       tag:
-        description: The image tag
-        type: string
-        default: "latest"
+        type: env_var_name
+        default: CIRCLE_TAG
     steps:
       - run:
-          name: Build <<parameters.image-name>>:<<parameters.tag>> docker image
+          name: Build <<parameters.image-name>> docker image
           command: |
-            docker build -t gcr.io/$<<parameters.google-project-id>>/<<parameters.image-name>>:<<parameters.tag>> -f <<parameters.dockerfile>> .
+            docker build -t gcr.io/$<<parameters.google-project-id>>/<<parameters.image-name>>:$<<parameters.tag>> -f <<parameters.dockerfile>> .
+            docker tag gcr.io/$<<parameters.google-project-id>>/<<parameters.image-name>>:$<<parameters.tag>> gcr.io/$<<parameters.google-project-id>>/<<parameters.image-name>>:latest
       - run:
-          name: Publish <<parameters.image-name>>:<<parameters.tag>> docker image
+          name: Publish <<parameters.image-name>>:$<<parameters.tag>> docker image
           command: |
-            docker push gcr.io/$<<parameters.google-project-id>>/<<parameters.image-name>>:<<parameters.tag>>
+            docker push gcr.io/$<<parameters.google-project-id>>/<<parameters.image-name>>:$<<parameters.tag>>
+            docker push gcr.io/$<<parameters.google-project-id>>/<<parameters.image-name>>:latest
 
   gke_kubectl_install:
     parameters:
@@ -228,8 +207,8 @@ commands:
       image-name:
         type: string
       tag:
-        type: string
-        default: "latest"
+        type: env_var_name
+        default: CIRCLE_TAG
       deployment:
         type: string
       namespace:
@@ -237,7 +216,7 @@ commands:
         default: "default"
     steps:
       - run:
-          name: Deploying <<parameters.image-name>>:<<parameters.tag>> to <<parameters.cluster>>
+          name: Deploying <<parameters.image-name>>:$<<parameters.tag>> to <<parameters.cluster>>
           command: |
-            ./kubectl -n <<parameters.namespace>> set image deployments/<<parameters.deployment>> <<parameters.image-name>>=gcr.io/$<<parameters.google-project-id>>/<<parameters.image-name>>:<<parameters.tag>>
+            ./kubectl -n <<parameters.namespace>> set image deployments/<<parameters.deployment>> <<parameters.image-name>>=gcr.io/$<<parameters.google-project-id>>/<<parameters.image-name>>:$<<parameters.tag>>
 
