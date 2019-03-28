@@ -2,13 +2,6 @@
 version: '2.1'
 
 services:
-  frontend:
-    image: nginx:1.15.9
-    volumes:
-      - ./public:/usr/share/nginx/html
-    ports:
-      - 8089:80
-
   tcpserver:
     image: alpine:3.9.2
     command: ["/tmp/bin/chat-tcp-server", "-server-addr", "0.0.0.0:4000"]
