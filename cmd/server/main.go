@@ -7,16 +7,16 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/Kochava/k8s-demo-chat/internal/broadcast"
 	"github.com/Kochava/k8s-demo-chat/internal/build"
-	"github.com/Kochava/k8s-demo-chat/internal/websocketutil"
 )
 
 func main() {
 	var (
 		err error
 
-		config          = build.NewConfig()
-		websocketServer *websocketutil.Server
+		config = build.NewConfig()
+		server broadcast.Server
 
 		sigs = make(chan os.Signal, 1)
 	)
@@ -28,12 +28,12 @@ func main() {
 
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
-	if websocketServer, err = build.WebsocketServer(config); err != nil {
+	if server, err = build.Server(config); err != nil {
 		log.Println("Unable to create websocket server:", err.Error())
 		return
 	}
 
-	if err = websocketServer.ListenAndServe(); err != nil {
+	if err = server.ListenAndServe(); err != nil {
 		log.Println("error starting server:", err.Error())
 	}
 }

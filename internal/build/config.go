@@ -6,6 +6,7 @@ import "github.com/Kochava/k8s-demo-chat/internal/build/redis"
 type Config struct {
 	Redis                    *redis.Config
 	ServerAddr               string
+	ServerMode               string
 	JSONValidationSchemaPath string
 }
 

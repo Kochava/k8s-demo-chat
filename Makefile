@@ -12,14 +12,8 @@ update: # Update submodules and other deps
 ###############################################################################
 # Server build targets
 ###############################################################################
-.PHONY: servers servers-websockets servers-tcp
-servers: servers-websockets servers-tcp
-
-servers-websockets: # Build the websockets binary
-	GOOS=linux CGO_ENABLED=0 GOARCH=amd64 go build -o $(MAKE_PATH)bin/chat-ws-server github.com/Kochava/k8s-demo-chat/cmd/websocketserver
-
-servers-tcp: # Build the tcp server binary
-	GOOS=linux CGO_ENABLED=0 GOARCH=amd64 go build -o $(MAKE_PATH)bin/chat-tcp-server github.com/Kochava/k8s-demo-chat/cmd/tcpserver
+servers: # Build the server binary
+	GOOS=linux CGO_ENABLED=0 GOARCH=amd64 go build -o $(MAKE_PATH)bin/chat-server github.com/Kochava/k8s-demo-chat/cmd/server
 
 ###############################################################################
 # Test targets
@@ -46,7 +40,10 @@ clean:
 .PHONY: run
 run: servers composer
 
-.PHONY: composer
-composer:
-	docker-compose -f docker/docker-compose.yml --project-directory . up 
+.PHONY: composer-up
+composer-up:
+	docker-compose -f docker/docker-compose.yml --project-directory . up --build
 
+.PHONY: composer-down
+composer-down:
+	docker-compose -f docker/docker-compose.yml --project-directory . down
