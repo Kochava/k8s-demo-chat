@@ -15,7 +15,7 @@ func main() {
 	var (
 		err error
 
-		config    = &build.Config{}
+		config    = build.NewConfig()
 		tcpServer *tcputil.Server
 
 		sigs = make(chan os.Signal, 1)

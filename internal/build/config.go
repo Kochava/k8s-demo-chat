@@ -8,3 +8,10 @@ type Config struct {
 	ServerAddr               string
 	JSONValidationSchemaPath string
 }
+
+// NewConfig initializes an empty config
+func NewConfig() *Config {
+	return &Config{
+		Redis: &redis.Config{},
+	}
+}

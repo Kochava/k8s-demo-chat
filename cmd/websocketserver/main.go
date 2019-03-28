@@ -15,7 +15,7 @@ func main() {
 	var (
 		err error
 
-		config          = &build.Config{}
+		config          = build.NewConfig()
 		websocketServer *websocketutil.Server
 
 		sigs = make(chan os.Signal, 1)
