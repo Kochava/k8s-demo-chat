@@ -146,6 +146,7 @@ commands:
           name: Build <<parameters.image-name>> docker image
           command: |
             docker build -t gcr.io/$<<parameters.google-project-id>>/<<parameters.image-name>>:$<<parameters.tag>> -f <<parameters.dockerfile>> .
+            docker tag gcr.io/$<<parameters.google-project-id>>/<<parameters.image-name>>:$<<parameters.tag>> gcr.io/$<<parameters.google-project-id>>/<<parameters.image-name>>:latest
       - run:
           name: Publish <<parameters.image-name>>:$<<parameters.tag>> docker image
           command: |
