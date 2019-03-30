@@ -6,7 +6,7 @@ services:
     build:
         context: .
         dockerfile: ./docker/chat-server/Dockerfile
-    command: ["/usr/local/bin/chat-server", "-server-addr", "0.0.0.0:4000", "-server-mode", "tcp"]
+    command: ["/usr/local/bin/chat-server", "-server-addr", "0.0.0.0:4000", "-server-mode", "tcp", "-health-addr", "0.0.0.0:5050"]
     volumes:
       - ./contrib/message-schema.json:/tmp/message-schema.json
     ports:
@@ -15,12 +15,17 @@ services:
       - 4000
     links:
       - redis
+    healthcheck:
+        test: curl http://localhost:5050/healthcheck
+        interval: 1s
+        retries: 5
+        timeout: 500ms
 
   websocketserver:
     build:
         context: .
         dockerfile: ./docker/chat-server/Dockerfile
-    command: ["/usr/local/bin/chat-server", "-server-addr", "0.0.0.0:4001", "-server-mode", "ws"]
+    command: ["/usr/local/bin/chat-server", "-server-addr", "0.0.0.0:4001", "-server-mode", "ws", "-health-addr", "0.0.0.0:5050"]
     volumes:
       - ./contrib/message-schema.json:/tmp/message-schema.json
     ports:
@@ -29,6 +34,11 @@ services:
       - 4001
     links:
       - redis
+    healthcheck:
+        test: curl http://localhost:5050/healthcheck
+        interval: 1s
+        retries: 5
+        timeout: 500ms
 
   redis:
     image: redis:3.2-alpine
