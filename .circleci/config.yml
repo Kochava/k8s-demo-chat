@@ -92,7 +92,7 @@ jobs:
           cluster: k8s-demo-cluster
       - gke_deploy:
           cluster: k8s-demo-cluster
-          namespace: k8s-demo
+          namespace: default
           deployment: chat-server
           image-name: k8sdemo-chat-server
 
