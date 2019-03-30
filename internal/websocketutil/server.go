@@ -20,7 +20,10 @@ func (server *Server) ListenAndServe() error {
 		mux = http.NewServeMux()
 	)
 
-	mux.Handle("/", server.HandleFunc)
+	mux.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("OK"))
+	}))
+	mux.Handle("/chat", server.HandleFunc)
 
 	server.httpServer = &http.Server{
 		Addr:    server.Addr,
