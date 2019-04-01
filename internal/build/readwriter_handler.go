@@ -7,6 +7,10 @@ import (
 	redis "github.com/go-redis/redis"
 )
 
+// GetReadWriterHandler uses the application's configuration to return a broadcast readwritehandler.
+//
+// This prepares a number of dependencies needed by the ReadWriteHandler but
+// not needed by other components of the application
 func GetReadWriterHandler(config *Config) (*broadcast.ReadWriteHandler, error) {
 	var (
 		err error

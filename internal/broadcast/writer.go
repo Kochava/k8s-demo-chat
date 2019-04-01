@@ -13,6 +13,7 @@ var (
 	_ writerutil.Storage = &Writer{}
 )
 
+// NewWriter constructs a Writer
 func NewWriter() *Writer {
 	return &Writer{
 		mutex:   &sync.Mutex{},
@@ -20,11 +21,13 @@ func NewWriter() *Writer {
 	}
 }
 
+// Writer is a fan out implementation of io.Writer that maintains writer state
 type Writer struct {
 	mutex   *sync.Mutex
 	writers map[string]io.Writer
 }
 
+// Write sends the specified message to all known writers
 func (broadcaster *Writer) Write(message []byte) (int, error) {
 	broadcaster.mutex.Lock()
 	defer broadcaster.mutex.Unlock()

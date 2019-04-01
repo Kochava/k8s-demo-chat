@@ -5,6 +5,7 @@ import (
 	"github.com/Kochava/k8s-demo-chat/internal/websocketutil"
 )
 
+// WebsocketServer builds a Server based on the configuration
 func WebsocketServer(config *Config) (*websocketutil.Server, error) {
 	var (
 		err              error

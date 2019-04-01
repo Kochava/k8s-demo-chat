@@ -15,6 +15,7 @@ var (
 	_ InputValidator = &JSONSchemaValidator{}
 )
 
+// NewJSONSchemaValidator constructs a JSONSchemaValidator
 func NewJSONSchemaValidator(schemaPath string) (*JSONSchemaValidator, error) {
 	var (
 		err       error
@@ -28,10 +29,12 @@ func NewJSONSchemaValidator(schemaPath string) (*JSONSchemaValidator, error) {
 	return validator, nil
 }
 
+// JSONSchemaValidator allows input validation
 type JSONSchemaValidator struct {
 	Schema *gojsonschema.Schema
 }
 
+// Valid determines if the input implements the specified schema
 func (validator *JSONSchemaValidator) Valid(input []byte) (bool, error) {
 	var (
 		err             error

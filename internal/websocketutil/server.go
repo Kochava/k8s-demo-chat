@@ -7,6 +7,7 @@ import (
 	"golang.org/x/net/websocket"
 )
 
+// Server defines an HTTP style server for WebSocket connections
 type Server struct {
 	Addr       string
 	HandleFunc websocket.Handler
@@ -14,6 +15,7 @@ type Server struct {
 	httpServer *http.Server
 }
 
+// ListenAndServe accepts new connections and routes them to the handler
 func (server *Server) ListenAndServe() error {
 	var (
 		err error
@@ -37,6 +39,7 @@ func (server *Server) ListenAndServe() error {
 	return nil
 }
 
+// Shutdown closes the listener to stop new connections
 func (server *Server) Shutdown(ctx context.Context) error {
 	return server.httpServer.Shutdown(ctx)
 }

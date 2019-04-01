@@ -9,10 +9,12 @@ var (
 	_ websocketutil.Handler = &WebsocketHandlerProxy{}
 )
 
+// WebsocketHandlerProxy proxies a WebSocketHandler to a ReadWriteHandler
 type WebsocketHandlerProxy struct {
 	ReadWriteHandler *ReadWriteHandler
 }
 
+// Handle processes a websocket connection
 func (handler *WebsocketHandlerProxy) Handle(conn *websocket.Conn) {
 	handler.ReadWriteHandler.Handle(conn)
 }
