@@ -10,10 +10,12 @@ var (
 	_ tcputil.Handler = &TCPHandlerProxy{}
 )
 
+// TCPHandlerProxy proxies a TCPHandler to a ReadWriteHandler
 type TCPHandlerProxy struct {
 	ReadWriteHandler *ReadWriteHandler
 }
 
+// Handle processes a tcp connection
 func (handler *TCPHandlerProxy) Handle(conn net.Conn) {
 	handler.ReadWriteHandler.Handle(conn)
 }

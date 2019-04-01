@@ -5,6 +5,7 @@ import (
 	"github.com/Kochava/k8s-demo-chat/internal/tcputil"
 )
 
+// TCPServer builds a Server based on the configuration
 func TCPServer(config *Config) (*tcputil.Server, error) {
 	var (
 		err error

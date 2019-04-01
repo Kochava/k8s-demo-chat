@@ -6,6 +6,7 @@ import (
 	"net"
 )
 
+// Server defines an HTTP style server for TCP connections
 type Server struct {
 	Addr    string
 	Handler Handler
@@ -13,6 +14,7 @@ type Server struct {
 	listener net.Listener
 }
 
+// ListenAndServe accepts new connections and routes them to the handler
 func (server *Server) ListenAndServe() error {
 	var (
 		err error
@@ -37,6 +39,7 @@ func (server *Server) ListenAndServe() error {
 	}
 }
 
+// Shutdown closes the listener to stop new connections
 func (server *Server) Shutdown(_ context.Context) error {
 	return server.listener.Close()
 }

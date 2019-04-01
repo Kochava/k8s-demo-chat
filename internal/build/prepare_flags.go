@@ -4,6 +4,7 @@ import (
 	"flag"
 )
 
+// PrepareFlags binds flags to configuration variables
 func PrepareFlags(config *Config) {
 	flag.StringVar(&config.Redis.Addr, "redis-addr", "redis:6379", "The address of the redis host")
 	flag.StringVar(&config.Redis.Channel, "redis-channel", "global-room", "the redis channel to subscribe/publish to")

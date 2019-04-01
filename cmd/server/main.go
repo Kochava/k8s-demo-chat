@@ -1,3 +1,4 @@
+// Command server starts a chat server
 package main
 
 import (

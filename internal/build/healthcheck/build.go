@@ -2,6 +2,7 @@ package healthcheck
 
 import "net/http"
 
+// Build uses the configuraiotn to return a http server for healthchecks
 func Build(config *Config) *http.Server {
 	var (
 		mux    = http.NewServeMux()
